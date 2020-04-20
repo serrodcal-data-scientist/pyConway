@@ -11,13 +11,13 @@ bg = 25, 25, 25
 screen.fill(bg)
 
 # Número de celdas
-nxC, nyC = 50, 50
+rows, cols = 50, 50
 # Dimensiones de la celda
-dimCW = width / nxC
-dimCH = height / nyC
+dimCW = width / cols
+dimCH = height / rows
 
 # Estado de las celdas: Vivas = 1; Muertas = 0
-gameState = np.zeros((nxC, nyC))
+gameState = np.zeros((rows, cols))
 
 # Autómata palo
 #gameState[5, 3] = 1
@@ -55,22 +55,22 @@ while True:
         if sum(mouseClick) > 0:
             posX, posY = pygame.mouse.get_pos()
             celX, celY = int(np.floor(posX / dimCW)), int(np.floor(posY / dimCH))
-            newGameState[celX, celY] = not mouseClick[2]
+            newGameState[celY, celX] = not mouseClick[2]
 
-    for y in range(nxC):
-        for x in range(nyC):
+    for x in range(rows):
+        for y in range(cols):
 
             if not pauseExect:
 
                 # Calculamos el número de vecinos cercanos (módulo para seguir regla del toróide)
-                n_neigh = gameState[(x - 1) % nxC, (y - 1) % nyC % nyC] + \
-                          gameState[(x)     % nxC, (y - 1) % nyC] + \
-                          gameState[(x + 1) % nxC, (y - 1) % nyC] + \
-                          gameState[(x - 1) % nxC, (y) % nyC] + \
-                          gameState[(x + 1) % nxC, (y) % nyC] + \
-                          gameState[(x - 1) % nxC, (y + 1) % nyC] + \
-                          gameState[(x)     % nxC, (y + 1) % nyC] + \
-                          gameState[(x + 1) % nxC, (y + 1) % nyC]
+                n_neigh = gameState[(x - 1) % rows, (y - 1) % cols ] + \
+                          gameState[(x)     % rows, (y - 1) % cols] + \
+                          gameState[(x + 1) % rows, (y - 1) % cols] + \
+                          gameState[(x - 1) % rows, (y)     % cols] + \
+                          gameState[(x + 1) % rows, (y)     % cols] + \
+                          gameState[(x - 1) % rows, (y + 1) % cols] + \
+                          gameState[(x)     % rows, (y + 1) % cols] + \
+                          gameState[(x + 1) % rows, (y + 1) % cols]
 
                 # Regla 1: Una célula muerta con exáctamente 3 vecinas vivas, "revive"
                 if gameState[x, y] == 0 and n_neigh == 3:
@@ -81,10 +81,10 @@ while True:
                     newGameState[x, y] = 0
 
             # Creamos el polígono de cada
-            poly = [((x)   * dimCW, y * dimCH),
-                    ((x+1) * dimCW, y * dimCH),
-                    ((x+1) * dimCW, (y+1) * dimCH),
-                    ((x)   * dimCW, (y+1) * dimCH)]
+            poly = [((y)   * dimCW, x * dimCH),
+                    ((y+1) * dimCW, x * dimCH),
+                    ((y+1) * dimCW, (x+1) * dimCH),
+                    ((y)   * dimCW, (x+1) * dimCH)]
 
             # Y dibujamos la celda para cada par de x e y
             if newGameState[x, y] == 0:
